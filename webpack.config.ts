@@ -1,12 +1,13 @@
 import path from 'path';
 import webpack from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import DevServer from 'webpack-dev-server';
 
 
 const cssRule: webpack.RuleSetRule = {
-  test: /\.css$/,
-  use: ['style-loader', 'css-loader']
+  test:  /\.s[ac]ss$/i,
+  use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
 };
 
 
@@ -16,8 +17,11 @@ const rules: webpack.RuleSetRule[] = [
 
 
 const htmlPlugin: HtmlWebpackPlugin = new HtmlWebpackPlugin({
-  template: 'index.html'
+  template: './index.html'
 });
+
+
+const cssPlugin: MiniCssExtractPlugin = new MiniCssExtractPlugin()
 
 
 const devServer: DevServer.Configuration = {
@@ -33,7 +37,8 @@ const config = (): webpack.Configuration => {
       path: path.resolve(__dirname, 'dist')
     },
     plugins: [
-      htmlPlugin
+      htmlPlugin,
+      cssPlugin
     ],
     module: {
       rules
