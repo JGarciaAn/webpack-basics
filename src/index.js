@@ -1,3 +1,2 @@
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('DOM Loaded');
-});
+import { testFn } from './utils/utils';
+testFn();
