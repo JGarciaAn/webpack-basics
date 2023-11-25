@@ -5,15 +5,31 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import DevServer from 'webpack-dev-server';
 
 
-const cssRule: webpack.RuleSetRule = {
-  test:  /\.s[ac]ss$/i,
-  use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
-};
+const cssRule = (isProduction: boolean): webpack.RuleSetRule => ({
+  test: /\.s[ac]ss$/i,
+  use: [
+    {
+      loader: MiniCssExtractPlugin.loader
+    },
+    {
+      loader: 'css-loader',
+      options: {
+        sourceMap: !isProduction
+      }
+    },
+    {
+      loader: 'sass-loader',
+      options: {
+        sourceMap: !isProduction
+      }
+    }
+  ]
+});
 
 
-const rules: webpack.RuleSetRule[] = [
-  cssRule
-];
+const rules = (isProduction: boolean): webpack.RuleSetRule[] => ([
+  cssRule(isProduction)
+]);
 
 
 const htmlPlugin: HtmlWebpackPlugin = new HtmlWebpackPlugin({
@@ -30,7 +46,9 @@ const devServer: DevServer.Configuration = {
 };
 
 
-const config = (): webpack.Configuration => {
+const config = (env, args): webpack.Configuration => {
+  const isProduction = args.mode === 'production';
+
   return {
     output: {
       filename: 'bundle-test.js',
@@ -41,9 +59,10 @@ const config = (): webpack.Configuration => {
       cssPlugin
     ],
     module: {
-      rules
+      rules: rules(isProduction)
     },
-    devServer
+    devServer,
+    devtool: 'source-map'
   }
 };
 
