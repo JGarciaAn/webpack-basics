@@ -1,0 +1,8 @@
+$font-names: ("semibold", "bold", "light", "medium", "regular", "thin");
+
+@each $font-name in $font-names {
+  @font-face {
+    font-family: "roboto-#{$font-name}";
+    src: url("/assets/fonts/roboto-#{$font-name}.ttf");
+  }
+}

@@ -5,6 +5,13 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import DevServer from 'webpack-dev-server';
 
 
+const assetsRule = (): webpack.RuleSetRule => ({
+  test: /\.(woof|woff2|ttf|eot|otf|png)$/i,
+  type: 'asset/resource'
+});
+
+
+
 const cssRule = (isProduction: boolean): webpack.RuleSetRule => ({
   test: /\.s[ac]ss$/i,
   use: [
@@ -28,7 +35,8 @@ const cssRule = (isProduction: boolean): webpack.RuleSetRule => ({
 
 
 const rules = (isProduction: boolean): webpack.RuleSetRule[] => ([
-  cssRule(isProduction)
+  cssRule(isProduction),
+  assetsRule()
 ]);
 
 
@@ -40,19 +48,21 @@ const htmlPlugin: HtmlWebpackPlugin = new HtmlWebpackPlugin({
 const cssPlugin: MiniCssExtractPlugin = new MiniCssExtractPlugin()
 
 
-const devServer: DevServer.Configuration = {
-  port: 4000,
+const devServer = (port: number): DevServer.Configuration => ({
+  port,
   open: true
-};
+});
 
 
 const config = (env, args): webpack.Configuration => {
   const isProduction = args.mode === 'production';
+  const port = args.port || 4000;
 
   return {
     output: {
       filename: 'bundle-test.js',
-      path: path.resolve(__dirname, 'dist')
+      path: path.resolve(__dirname, 'dist'),
+      assetModuleFilename: '[path][hash][ext]'
     },
     plugins: [
       htmlPlugin,
@@ -61,10 +71,9 @@ const config = (env, args): webpack.Configuration => {
     module: {
       rules: rules(isProduction)
     },
-    devServer,
+    devServer: devServer(port),
     devtool: 'source-map'
   }
 };
-
 
 export default config;
