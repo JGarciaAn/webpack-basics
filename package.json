@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "webpack --mode=development",
-    "build:prod": "webpack --mode=production",
-    "start": "webpack serve --mode=development"
+    "build": "webpack --mode=development --env development",
+    "build:pre": "webpack --mode=development --env preproduction",
+    "build:prod": "webpack --mode=production --env production",
+    "start": "webpack serve --mode=development --env development",
+    "start:pre": "webpack serve --mode=development --env preproduction",
+    "start:prod": "webpack serve --mode=production --env production"
   },
   "author": "Javier García Antúnez",
   "license": "ISC",
@@ -13,6 +16,7 @@
     "@types/node": "^20.9.5",
     "@types/webpack": "^5.28.5",
     "@types/webpack-dev-server": "^4.7.2",
+    "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.8.1",
     "html-webpack-plugin": "^5.5.3",
     "mini-css-extract-plugin": "^2.7.6",

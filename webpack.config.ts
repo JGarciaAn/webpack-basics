@@ -3,13 +3,14 @@ import webpack from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import DevServer from 'webpack-dev-server';
+import CopyPlugin from 'copy-webpack-plugin';
+
 
 
 const assetsRule = (): webpack.RuleSetRule => ({
   test: /\.(woof|woff2|ttf|eot|otf|png)$/i,
   type: 'asset/resource'
 });
-
 
 
 const cssRule = (isProduction: boolean): webpack.RuleSetRule => ({
@@ -45,7 +46,23 @@ const htmlPlugin: HtmlWebpackPlugin = new HtmlWebpackPlugin({
 });
 
 
-const cssPlugin: MiniCssExtractPlugin = new MiniCssExtractPlugin()
+const cssPlugin: MiniCssExtractPlugin = new MiniCssExtractPlugin();
+
+
+const copyPlugin = (mode: string): CopyPlugin => {
+  return new CopyPlugin({
+    patterns: [
+      {
+        from: 'assets/**/*.json',
+        to: '[path][name][ext]'
+      },
+      {
+        from: `environment/${mode}`,
+        to: `environment`
+      }
+    ]
+  })
+};
 
 
 const devServer = (port: number): DevServer.Configuration => ({
@@ -57,22 +74,28 @@ const devServer = (port: number): DevServer.Configuration => ({
 const config = (env, args): webpack.Configuration => {
   const isProduction = args.mode === 'production';
   const port = args.port || 4000;
+  const environment = Object.keys(env)
+    .filter(key => ['development', 'preproduction', 'production'].includes(key))[0];
 
   return {
     output: {
       filename: 'bundle-test.js',
       path: path.resolve(__dirname, 'dist'),
-      assetModuleFilename: '[path][hash][ext]'
+      assetModuleFilename: (path, asset) => {
+        const ext = path.filename.split('.').pop();
+        return `[path]${ext === 'json' ? '[name]' : '[hash]'}[ext]`;
+      }
     },
     plugins: [
       htmlPlugin,
-      cssPlugin
+      cssPlugin,
+      copyPlugin(environment)
     ],
     module: {
       rules: rules(isProduction)
     },
     devServer: devServer(port),
-    devtool: 'source-map'
+    ...(!isProduction ? { devtool: 'source-map' } : {})
   }
 };
 
