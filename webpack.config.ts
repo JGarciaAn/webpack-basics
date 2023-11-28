@@ -7,6 +7,13 @@ import CopyPlugin from 'copy-webpack-plugin';
 
 
 
+const typescriptRule = (): webpack.RuleSetRule => ({
+  test: /\.ts$/i,
+  loader: 'ts-loader',
+  exclude: '/node_modules/'
+});
+
+
 const assetsRule = (): webpack.RuleSetRule => ({
   test: /\.(woof|woff2|ttf|eot|otf|png)$/i,
   type: 'asset/resource'
@@ -78,6 +85,7 @@ const config = (env, args): webpack.Configuration => {
     .filter(key => ['development', 'preproduction', 'production'].includes(key))[0];
 
   return {
+    entry: './src/index.ts',
     output: {
       filename: 'bundle-test.js',
       path: path.resolve(__dirname, 'dist'),
@@ -93,6 +101,9 @@ const config = (env, args): webpack.Configuration => {
     ],
     module: {
       rules: rules(isProduction)
+    },
+    resolve: {
+      extensions: ['.ts', '.js']
     },
     devServer: devServer(port),
     ...(!isProduction ? { devtool: 'source-map' } : {})
