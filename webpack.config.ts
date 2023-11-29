@@ -44,7 +44,8 @@ const cssRule = (isProduction: boolean): webpack.RuleSetRule => ({
 
 const rules = (isProduction: boolean): webpack.RuleSetRule[] => ([
   cssRule(isProduction),
-  assetsRule()
+  assetsRule(),
+  typescriptRule()
 ]);
 
 
@@ -86,13 +87,12 @@ const config = (env, args): webpack.Configuration => {
 
   return {
     entry: './src/index.ts',
+    cache: false,
+    mode: isProduction ? 'production' : 'development',
     output: {
       filename: 'bundle-test.js',
       path: path.resolve(__dirname, 'dist'),
-      assetModuleFilename: (path, asset) => {
-        const ext = path.filename.split('.').pop();
-        return `[path]${ext === 'json' ? '[name]' : '[hash]'}[ext]`;
-      }
+      assetModuleFilename: '[path][hash][ext]'
     },
     plugins: [
       htmlPlugin,
@@ -104,6 +104,11 @@ const config = (env, args): webpack.Configuration => {
     },
     resolve: {
       extensions: ['.ts', '.js']
+    },
+    optimization: {
+      minimize: true,     
+      sideEffects: true,
+      usedExports: true,
     },
     devServer: devServer(port),
     ...(!isProduction ? { devtool: 'source-map' } : {})
