@@ -7,16 +7,11 @@ import CopyPlugin from 'copy-webpack-plugin';
 
 
 
+
 const typescriptRule = (): webpack.RuleSetRule => ({
   test: /\.ts$/i,
   loader: 'ts-loader',
   exclude: '/node_modules/'
-});
-
-
-const assetsRule = (): webpack.RuleSetRule => ({
-  test: /\.(woof|woff2|ttf|eot|otf|png)$/i,
-  type: 'asset/resource'
 });
 
 
@@ -42,6 +37,12 @@ const cssRule = (isProduction: boolean): webpack.RuleSetRule => ({
 });
 
 
+const assetsRule = (): webpack.RuleSetRule => ({
+  test: /\.(woof|woff2|ttf|eot|otf|png)$/i,
+  type: 'asset/resource'
+});
+
+
 const rules = (isProduction: boolean): webpack.RuleSetRule[] => ([
   cssRule(isProduction),
   assetsRule(),
@@ -50,7 +51,8 @@ const rules = (isProduction: boolean): webpack.RuleSetRule[] => ([
 
 
 const htmlPlugin: HtmlWebpackPlugin = new HtmlWebpackPlugin({
-  template: './index.html'
+  template: './index.html',
+  scriptLoading: 'blocking'
 });
 
 
@@ -75,7 +77,9 @@ const copyPlugin = (mode: string): CopyPlugin => {
 
 const devServer = (port: number): DevServer.Configuration => ({
   port,
-  open: true
+  open: true,
+  hot: true,
+  watchFiles: ['./index.html', './assets/i18n/*']
 });
 
 
@@ -105,13 +109,17 @@ const config = (env, args): webpack.Configuration => {
     resolve: {
       extensions: ['.ts', '.js']
     },
-    optimization: {
-      minimize: true,     
-      sideEffects: true,
-      usedExports: true,
-    },
     devServer: devServer(port),
-    ...(!isProduction ? { devtool: 'source-map' } : {})
+    ...(!isProduction ? {
+      devtool: 'source-map',
+    } : {
+      optimization: {
+        minimize: true,
+        sideEffects: true,
+        usedExports: true,
+      }
+    }),
+
   }
 };
 
