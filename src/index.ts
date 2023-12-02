@@ -1,14 +1,18 @@
 import { testFn } from './utils/utils';
-import '../styles/styles.scss';
+import './components';
+
+
+const styles = require('../styles/styles.scss').toString();
+const styleElement = document.createElement('style');
+styleElement.textContent = styles;
+document.head.appendChild(styleElement);
 
 
 testFn();
+testLazyLoad();
+testI18n();
+testEnvironment();
 
-document.addEventListener('DOMContentLoaded', () => {
-  testLazyLoad();
-  testI18n();
-  testEnvironment();
-});
 
 
 function testLazyLoad() {

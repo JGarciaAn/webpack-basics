@@ -1,11 +1,22 @@
 import path from 'path';
 import webpack from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
-import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import DevServer from 'webpack-dev-server';
 import CopyPlugin from 'copy-webpack-plugin';
 
 
+
+const htmlRule = (): webpack.RuleSetRule => ({
+  test: /\.html$/i,
+  loader: 'html-loader',
+  options: {
+    sources: true,
+    esModule: false,
+    minimize: {
+      collapseWhitespace: true
+    }
+  }
+});
 
 
 const typescriptRule = (): webpack.RuleSetRule => ({
@@ -15,12 +26,11 @@ const typescriptRule = (): webpack.RuleSetRule => ({
 });
 
 
-const cssRule = (isProduction: boolean): webpack.RuleSetRule => ({
+
+const stylesRule = (isProduction: boolean): webpack.RuleSetRule => ({
   test: /\.s[ac]ss$/i,
   use: [
-    {
-      loader: MiniCssExtractPlugin.loader
-    },
+    'to-string-loader',
     {
       loader: 'css-loader',
       options: {
@@ -32,7 +42,7 @@ const cssRule = (isProduction: boolean): webpack.RuleSetRule => ({
       options: {
         sourceMap: !isProduction
       }
-    }
+    },
   ]
 });
 
@@ -44,9 +54,10 @@ const assetsRule = (): webpack.RuleSetRule => ({
 
 
 const rules = (isProduction: boolean): webpack.RuleSetRule[] => ([
-  cssRule(isProduction),
+  stylesRule(isProduction),
   assetsRule(),
-  typescriptRule()
+  typescriptRule(),
+  htmlRule()
 ]);
 
 
@@ -55,8 +66,6 @@ const htmlPlugin: HtmlWebpackPlugin = new HtmlWebpackPlugin({
   scriptLoading: 'blocking'
 });
 
-
-const cssPlugin: MiniCssExtractPlugin = new MiniCssExtractPlugin();
 
 
 const copyPlugin = (mode: string): CopyPlugin => {
@@ -100,14 +109,13 @@ const config = (env, args): webpack.Configuration => {
     },
     plugins: [
       htmlPlugin,
-      cssPlugin,
       copyPlugin(environment)
     ],
     module: {
       rules: rules(isProduction)
     },
     resolve: {
-      extensions: ['.ts', '.js']
+      extensions: ['.ts', '.js', '.scss', '.css']
     },
     devServer: devServer(port),
     ...(!isProduction ? {
