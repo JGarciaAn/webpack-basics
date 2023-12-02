@@ -1,0 +1,30 @@
+.card {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  padding: 16px;
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__title {
+    margin: 0;
+    font-family: 'roboto-semibold';
+    color: #333;
+    font-size: 18px;
+    line-height: 22px;
+  }
+
+  &__description {
+    margin: 0;
+    font-family: 'roboto-regular';
+    color: #222;
+    font-size: 14px;
+    line-height: 16px;
+  }
+}

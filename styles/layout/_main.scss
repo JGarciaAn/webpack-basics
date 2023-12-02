@@ -17,3 +17,11 @@ body {
   background-image: url('/assets/imgs/background_image.png');
   background-size: 100%;
 }
+
+
+.app-articles {
+  display: flex;
+  padding: 24px;
+  flex-direction: column;
+  gap: 24px;
+}
